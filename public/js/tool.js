@@ -40,3 +40,18 @@ hamburger.addEventListener("click", function () {
   socket.emit("hamburger");
 });
 
+// ******************Clear Canvas****************************
+const clearTool = document.querySelector(".clear-tool");
+clearTool.addEventListener("click", function () {
+  if (confirm("Are you sure you want to clear the canvas?")) {
+    handleClearCanvas();
+    socket.emit("clear");
+  }
+});
+
+function handleClearCanvas() {
+  ctx.clearRect(0, 0, board.width, board.height);
+  undoStack = [];
+  redoStack = [];
+}
+
