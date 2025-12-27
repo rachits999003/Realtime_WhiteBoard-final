@@ -218,15 +218,11 @@ Contributions are welcome! Please follow these steps:
 - Large image uploads may cause performance issues
 - Undo/Redo doesn't sync across users (by design)
 
-## 📄 License
-
-This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
 
 ## 👥 Credits
 
 **Original Author**: Jayesh Jagtap - [GitHub](https://github.com/csjayzz) • [LinkedIn](https://www.linkedin.com/in/jayesh-jagtap-63a135263/)
 
-**Maintained by**: Rachit Singh - [GitHub](https://github.com/rachits999003)
 
 ## 🙏 Acknowledgments
 
