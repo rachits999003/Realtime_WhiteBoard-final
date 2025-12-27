@@ -32,3 +32,8 @@ socket.on("onundo", function() {
 socket.on("onredo", function() {
   redoMaker();
 });
+socket.on("onclear", function() {
+  ctx.clearRect(0, 0, board.width, board.height);
+  undoStack = [];
+  redoStack = [];
+});
