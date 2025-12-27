@@ -1,5 +1,9 @@
 // connect to socket server
-const socket = io.connect("https://drawease.onrender.com");
+// Use window.location.origin for dynamic URL, fallback to production URL
+const socketUrl = window.location.hostname === 'localhost' 
+  ? 'http://localhost:3000' 
+  : 'https://drawease.onrender.com';
+const socket = io.connect(socketUrl);
 // *********************************Basic Setup
 const board = document.querySelector(".board");
 board.height = window.innerHeight;
