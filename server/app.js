@@ -7,19 +7,33 @@ const express = require("express");
 const http = require("http");
 const path = require("path");
 const socketIO = require("socket.io");
+const cors = require("cors");
 const config = require("./config");
 
 // Initialize Express app
 const app = express();
 const server = http.createServer(app);
 
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Input validation helper
+const validateDrawingData = (data) => {
+  if (!data || typeof data !== "object") return false;
+  if (typeof data.x !== "number" || typeof data.y !== "number") return false;
+  if (data.color && typeof data.color !== "string") return false;
+  if (data.width && typeof data.width !== "number") return false;
+  return true;
+};
+
 // Initialize Socket.IO with CORS configuration
-const io = socketIO(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  }
-});
+const corsOptions = config.isDevelopment
+  ? { origin: "*", methods: ["GET", "POST"] }
+  : { origin: process.env.ALLOWED_ORIGINS?.split(",") || [], methods: ["GET", "POST"] };
+
+const io = socketIO(server, { cors: corsOptions });
 
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, "../public")));
@@ -30,10 +44,18 @@ io.on("connection", (socket) => {
 
   // Drawing events
   socket.on("mousedown", (point) => {
+    if (!validateDrawingData(point)) {
+      console.warn(`Invalid drawing data from ${socket.id}`);
+      return;
+    }
     socket.broadcast.emit("onmousedown", point);
   });
 
   socket.on("mousemove", (point) => {
+    if (!validateDrawingData(point)) {
+      console.warn(`Invalid drawing data from ${socket.id}`);
+      return;
+    }
     socket.broadcast.emit("onmousemove", point);
   });
 
@@ -43,14 +65,27 @@ io.on("connection", (socket) => {
 
   // Tool change events
   socket.on("toolchange", (tool) => {
+    const validTools = ["pencil", "eraser", "sticky", "upload"];
+    if (!validTools.includes(tool)) {
+      console.warn(`Invalid tool from ${socket.id}: ${tool}`);
+      return;
+    }
     socket.broadcast.emit("ontoolchange", tool);
   });
 
   socket.on("size", (size) => {
+    if (typeof size !== "number" || size < 1 || size > 100) {
+      console.warn(`Invalid size value from ${socket.id}: ${size}`);
+      return;
+    }
     socket.broadcast.emit("onsize", size);
   });
 
   socket.on("color", (color) => {
+    if (typeof color !== "string" || color.length > 9) {
+      console.warn(`Invalid color value from ${socket.id}: ${color}`);
+      return;
+    }
     socket.broadcast.emit("oncolor", color);
   });
 
